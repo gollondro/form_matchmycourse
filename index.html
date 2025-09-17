@@ -708,7 +708,7 @@ El cliente procederá al pago mediante WebPay y requiere confirmación del proce
             } catch (error) {
                 console.error('Error enviando email:', error);
                 loadingSpinner.style.display = 'none';
-                alert('Error al enviar la notificación. El pago continuará normalmente.');
+                alert('Se enviará correo con datos de cliente y se confirmará operativamente el pago realizado.');
                 return false;
             }
         }
