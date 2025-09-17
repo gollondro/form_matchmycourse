@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Pago - AFEX Chile</title>
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 550px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logos-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            height: 80px;
+            width: auto;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-matchmycourse {
+            height: 80px;
+            border-radius: 10px;
+        }
+
+        .logo-afex {
+            height: 70px;
+        }
+
+        .partnership-text {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        select, input[type="number"], input[type="email"], input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: white;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .conversion-info {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            margin: 25px 0;
+            box-shadow: 0 10px 20px rgba(240, 147, 251, 0.2);
+        }
+
+        .conversion-info h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .conversion-amount {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .exchange-rate {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .form-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 25px 0;
+            border-left: 4px solid #007bff;
+        }
+
+        .form-summary h4 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .summary-label {
+            color: #666;
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .webpay-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 25px;
+            border: 2px dashed #dee2e6;
+        }
+
+        .webpay-section h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .webpay-form {
+            display: flex;
+            justify-content: center;
+        }
+
+        .webpay-button {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+
+        .webpay-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .webpay-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .flag {
+            display: inline-block;
+            width: 20px;
+            height: 15px;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+
+        .flag-nz {
+            background: linear-gradient(45deg, #0f4c75 50%, #ff0000 50%);
+        }
+
+        .flag-ie {
+            background: linear-gradient(90deg, #009639 33%, white 33%, white 66%, #ff7900 66%);
+        }
+
+        .disabled-message {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #c3e6cb;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .loading .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        .important-note {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 1px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0 0 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.15);
+        }
+
+        .note-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .note-content {
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .note-content strong {
+            color: #533002;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+                margin: 10px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .conversion-amount {
+                font-size: 28px;
+            }
+
+            .logos-container {
+                gap: 20px;
+            }
+
+            .logo {
+                height: 60px;
+            }
+
+            .logo-matchmycourse {
+                height: 60px;
+            }
+
+            .logo-afex {
+                height: 55px;
+            }
+
+            .important-note {
+                padding: 15px;
+                gap: 12px;
+            }
+
+            .note-icon {
+                font-size: 20px;
+            }
+
+            .note-content {
+                font-size: 13px;
+            }
+
+            .note-content strong {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logos-container">
+                <img src="https://yt3.googleusercontent.com/4t9oFPZfiO9jqVsMXnMaM8vVz0i_flDxPdypWQqMkgDCgw-aMtU07Bq1Q7xWaVyurh7lB2MK=s900-c-k-c0x00ffffff-no-rj" 
+                     alt="MatchMyCourse" 
+                     class="logo logo-matchmycourse"
+                     onerror="this.style.display='none'">
+                <div style="font-size: 24px; color: #ccc;">×</div>
+                <img src="https://media.licdn.com/dms/image/v2/C4D0BAQH4ohCvvGCIMw/company-logo_200_200/company-logo_200_200/0/1652276828860/afex_chile_logo?e=2147483647&v=beta&t=c2iBs5X3_971_a9kxY2TPf-jm7FEzj61pT3p-mqHddE" 
+                     alt="AFEX Chile" 
+                     class="logo logo-afex"
+                     onerror="this.src='https://via.placeholder.com/200x80/007bff/white?text=AFEX+CHILE'">
+            </div>
+            <div class="partnership-text">Alianza estratégica para transferencias internacionales</div>
+            <h1>🌍 Transferencia Internacional</h1>
+            <p>Completa los datos para procesar tu pago</p>
+        </div>
+
+        <div class="loading" id="loadingSpinner">
+            <div class="spinner"></div>
+            <p>Enviando solicitud...</p>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            ✅ Solicitud enviada exitosamente. Se ha notificado a nuestro equipo y recibirás confirmación pronto.
+        </div>
+
+        <form id="transferForm">
+            <div class="form-group">
+                <label for="nombreCompleto">Nombre Completo <span class="required">*</span></label>
+                <input type="text" id="nombreCompleto" name="nombreCompleto" placeholder="Ingresa tu nombre completo" required>
+                <div class="input-hint">Nombre y apellidos como aparecen en tu documento de identidad</div>
+                <div class="error-message" id="errorNombre">El nombre es obligatorio</div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Correo Electrónico <span class="required">*</span></label>
+                <input type="email" id="email" name="email" placeholder="tu@email.com" required>
+                <div class="input-hint">Recibirás confirmaciones en esta dirección</div>
+                <div class="error-message" id="errorEmail">Ingresa un correo electrónico válido</div>
+            </div>
+
+            <div class="form-group">
+                <label for="rut">RUT <span class="required">*</span></label>
+                <input type="text" id="rut" name="rut" placeholder="12.345.678-9" maxlength="12" required>
+                <div class="input-hint">Formato: 12.345.678-9</div>
+                <div class="error-message" id="errorRut">RUT inválido. Formato correcto: 12.345.678-9</div>
+            </div>
+
+            <div class="form-group">
+                <label for="cuentaDestino">Cuenta Destino <span class="required">*</span></label>
+                <select id="cuentaDestino" name="cuentaDestino" required>
+                    <option value="">Selecciona un destino</option>
+                    <option value="new_zealand">
+                        🇳🇿 New Zealand
+                    </option>
+                    <option value="ireland">
+                        🇮🇪 Ireland
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="montoUSD">Monto a enviar (USD) <span class="required">*</span></label>
+                <input type="number" id="montoUSD" name="montoUSD" min="1" step="0.01" placeholder="Ingresa el monto en dólares" required>
+                <div class="error-message" id="errorMonto">El monto debe ser mayor a $0</div>
+            </div>
+
+            <div class="conversion-info" id="conversionInfo" style="display: none;">
+                <h3>💱 Conversión a Pesos Chilenos</h3>
+                <div class="conversion-amount" id="montoCLP">$0 CLP</div>
+                <div class="exchange-rate" id="exchangeRate">Tipo de cambio: $1 USD = $948 CLP</div>
+            </div>
+
+            <div class="form-summary" id="formSummary" style="display: none;">
+                <h4>📋 Resumen de la Solicitud</h4>
+                <div class="summary-item">
+                    <span class="summary-label">Nombre:</span>
+                    <span class="summary-value" id="summaryNombre">-</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Email:</span>
+                    <span class="summary-value" id="summaryEmail">-</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">RUT:</span>
+                    <span class="summary-value" id="summaryRut">-</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Destino:</span>
+                    <span class="summary-value" id="summaryDestino">-</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Monto USD:</span>
+                    <span class="summary-value" id="summaryMontoUSD">-</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Monto CLP:</span>
+                    <span class="summary-value" id="summaryMontoCLP">-</span>
+                </div>
+            </div>
+        </form>
+
+        <div class="webpay-section">
+            <h3>🔒 Proceder al Pago</h3>
+            <form name="rec20108_btn1" method="post" action="https://www.webpay.cl/backpub/external/form-pay" class="webpay-form">
+                <input type="hidden" name="idFormulario" value="318337" />
+                <input type="hidden" name="monto" value="0" id="hiddenMonto" />
+                <input 
+                    type="image" 
+                    title="Pagar con WebPay" 
+                    name="button1" 
+                    src="https://www.webpay.cl/assets/img/boton_webpaycl.svg" 
+                    value="Boton 1" 
+                    class="webpay-button"
+                    id="webpayButton"
+                    disabled
+                />
+            </form>
+            <div class="disabled-message" id="disabledMessage">
+                Complete todos los campos obligatorios para habilitar el pago
+            </div>
+        </div>
+
+        <div class="important-note">
+            <div class="note-icon">⚠️</div>
+            <div class="note-content">
+                <strong>Nota importante:</strong> El monto mostrado en la página de Transbank no puede ser modificado. Corresponde al valor calculado automáticamente según el tipo de cambio vigente.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración EmailJS - REEMPLAZAR CON TUS CLAVES REALES
+        (function(){
+            emailjs.init("tu_public_key_aqui"); // Reemplazar con tu Public Key de EmailJS
+        })();
+
+        // Configuración de tipos de cambio (actualizable)
+        const EXCHANGE_RATE = 948; // 1 USD = 948 CLP
+        
+        // Referencias a elementos del DOM
+        const nombreCompletoInput = document.getElementById('nombreCompleto');
+        const emailInput = document.getElementById('email');
+        const rutInput = document.getElementById('rut');
+        const cuentaDestinoSelect = document.getElementById('cuentaDestino');
+        const montoUSDInput = document.getElementById('montoUSD');
+        const conversionInfo = document.getElementById('conversionInfo');
+        const montoCLPDiv = document.getElementById('montoCLP');
+        const exchangeRateDiv = document.getElementById('exchangeRate');
+        const hiddenMontoInput = document.getElementById('hiddenMonto');
+        const webpayButton = document.getElementById('webpayButton');
+        const disabledMessage = document.getElementById('disabledMessage');
+        const formSummary = document.getElementById('formSummary');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const successMessage = document.getElementById('successMessage');
+
+        // Referencias a mensajes de error
+        const errorNombre = document.getElementById('errorNombre');
+        const errorEmail = document.getElementById('errorEmail');
+        const errorRut = document.getElementById('errorRut');
+        const errorMonto = document.getElementById('errorMonto');
+
+        // Referencias a elementos del resumen
+        const summaryNombre = document.getElementById('summaryNombre');
+        const summaryEmail = document.getElementById('summaryEmail');
+        const summaryRut = document.getElementById('summaryRut');
+        const summaryDestino = document.getElementById('summaryDestino');
+        const summaryMontoUSD = document.getElementById('summaryMontoUSD');
+        const summaryMontoCLP = document.getElementById('summaryMontoCLP');
+
+        // Función para formatear números con puntos de miles
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('es-CL').format(Math.round(amount));
+        }
+
+        // Validación de RUT chileno
+        function validateRUT(rut) {
+            // Limpiar el RUT
+            rut = rut.replace(/\./g, '').replace(/-/g, '');
+            
+            if (rut.length < 8 || rut.length > 9) return false;
+            
+            const body = rut.slice(0, -1);
+            const dv = rut.slice(-1).toLowerCase();
+            
+            let sum = 0;
+            let multiplier = 2;
+            
+            for (let i = body.length - 1; i >= 0; i--) {
+                sum += parseInt(body[i]) * multiplier;
+                multiplier = multiplier === 7 ? 2 : multiplier + 1;
+            }
+            
+            const expectedDV = 11 - (sum % 11);
+            const finalDV = expectedDV === 11 ? '0' : expectedDV === 10 ? 'k' : expectedDV.toString();
+            
+            return dv === finalDV;
+        }
+
+        // Formatear RUT automáticamente
+        function formatRUT(rut) {
+            // Limpiar el RUT
+            rut = rut.replace(/\./g, '').replace(/-/g, '').replace(/\D/g, '');
+            
+            if (rut.length <= 1) return rut;
+            
+            if (rut.length <= 8) {
+                const body = rut.slice(0, -1);
+                const dv = rut.slice(-1);
+                return body.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + (body ? '-' : '') + dv;
+            } else {
+                const body = rut.slice(0, -1);
+                const dv = rut.slice(-1);
+                return body.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '-' + dv;
+            }
+        }
+
+        // Event listener para formateo automático del RUT
+        rutInput.addEventListener('input', function() {
+            const formatted = formatRUT(this.value);
+            this.value = formatted;
+            validateForm();
+        });
+
+        // Función para actualizar la conversión
+        function updateConversion() {
+            const montoUSD = parseFloat(montoUSDInput.value) || 0;
+            
+            if (montoUSD > 0) {
+                const montoCLP = montoUSD * EXCHANGE_RATE;
+                
+                // Mostrar información de conversión
+                conversionInfo.style.display = 'block';
+                montoCLPDiv.textContent = `$${formatCurrency(montoCLP)} CLP`;
+                exchangeRateDiv.textContent = `Tipo de cambio: $1 USD = $${formatCurrency(EXCHANGE_RATE)} CLP`;
+                
+                // Actualizar campo oculto para WebPay
+                hiddenMontoInput.value = Math.round(montoCLP);
+                
+                // Ocultar mensaje de error
+                errorMonto.style.display = 'none';
+            } else {
+                conversionInfo.style.display = 'none';
+                hiddenMontoInput.value = '0';
+            }
+            
+            updateSummary();
+            validateForm();
+        }
+
+        // Función para actualizar el resumen
+        function updateSummary() {
+            const nombre = nombreCompletoInput.value;
+            const email = emailInput.value;
+            const rut = rutInput.value;
+            const destino = cuentaDestinoSelect.value;
+            const destinoText = destino === 'new_zealand' ? 'New Zealand' : destino === 'ireland' ? 'Ireland' : '';
+            const montoUSD = parseFloat(montoUSDInput.value) || 0;
+            const montoCLP = montoUSD * EXCHANGE_RATE;
+
+            if (nombre && email && rut && destino && montoUSD > 0) {
+                formSummary.style.display = 'block';
+                summaryNombre.textContent = nombre;
+                summaryEmail.textContent = email;
+                summaryRut.textContent = rut;
+                summaryDestino.textContent = destinoText;
+                summaryMontoUSD.textContent = `${montoUSD.toLocaleString('es-CL', {minimumFractionDigits: 2})} USD`;
+                summaryMontoCLP.textContent = `${formatCurrency(montoCLP)} CLP`;
+            } else {
+                formSummary.style.display = 'none';
+            }
+        }
+
+        // Función para validar todo el formulario
+        function validateForm() {
+            const nombre = nombreCompletoInput.value.trim();
+            const email = emailInput.value;
+            const rut = rutInput.value;
+            const destino = cuentaDestinoSelect.value;
+            const montoUSD = parseFloat(montoUSDInput.value) || 0;
+
+            // Validar nombre
+            const nombreValid = nombre.length >= 2;
+            errorNombre.style.display = nombre && !nombreValid ? 'block' : 'none';
+
+            // Validar email
+            const emailValid = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            errorEmail.style.display = email && !emailValid ? 'block' : 'none';
+
+            // Validar RUT
+            const rutValid = rut && validateRUT(rut);
+            errorRut.style.display = rut && !rutValid ? 'block' : 'none';
+
+            // Validar monto
+            const montoValid = montoUSD > 0;
+            errorMonto.style.display = montoUSD !== 0 && !montoValid ? 'block' : 'none';
+
+            // Habilitar/deshabilitar botón
+            const allValid = nombreValid && emailValid && rutValid && destino && montoValid;
+            webpayButton.disabled = !allValid;
+            disabledMessage.style.display = allValid ? 'none' : 'block';
+
+            return allValid;
+        }
+
+        // Función para enviar correo con EmailJS
+        async function sendEmail(formData) {
+            try {
+                loadingSpinner.style.display = 'block';
+                
+                // Parámetros del template
+                const templateParams = {
+                    to_email: 'marcelo.caracci@afex.cl',
+                    from_email: formData.email,
+                    from_name: formData.nombre,
+                    subject: `Nueva Solicitud de Pago - ${formData.destino}`,
+                    nombre_completo: formData.nombre,
+                    email_cliente: formData.email,
+                    rut_cliente: formData.rut,
+                    destino: formData.destinoText,
+                    monto_usd: formData.montoUSD,
+                    monto_clp: formData.montoCLP,
+                    fecha: new Date().toLocaleString('es-CL'),
+                    message: `Nueva solicitud de transferencia internacional:
+
+👤 Nombre: ${formData.nombre}
+📧 Email: ${formData.email}
+🆔 RUT: ${formData.rut}
+🌍 Destino: ${formData.destinoText}
+💰 Monto: ${formData.montoUSD} USD (equivalente a ${formatCurrency(formData.montoCLP)} CLP)
+📅 Fecha: ${new Date().toLocaleString('es-CL')}
+💳 ID Formulario WebPay: 318337
+
+El cliente procederá al pago mediante WebPay y requiere confirmación del proceso.`
+                };
+
+                // Enviar email usando EmailJS
+                await emailjs.send(
+                    'tu_service_id_aqui', // Reemplazar con tu Service ID
+                    'tu_template_id_aqui', // Reemplazar con tu Template ID
+                    templateParams
+                );
+
+                loadingSpinner.style.display = 'none';
+                successMessage.style.display = 'block';
+                
+                return true;
+            } catch (error) {
+                console.error('Error enviando email:', error);
+                loadingSpinner.style.display = 'none';
+                alert('Error al enviar la notificación. El pago continuará normalmente.');
+                return false;
+            }
+        }
+
+        // Event listeners
+        nombreCompletoInput.addEventListener('input', function() {
+            updateSummary();
+            validateForm();
+        });
+        nombreCompletoInput.addEventListener('blur', validateForm);
+        emailInput.addEventListener('input', validateForm);
+        emailInput.addEventListener('blur', validateForm);
+        rutInput.addEventListener('blur', validateForm);
+        montoUSDInput.addEventListener('input', updateConversion);
+        montoUSDInput.addEventListener('blur', function() {
+            if (parseFloat(this.value) < 0) {
+                this.value = '';
+                updateConversion();
+            }
+        });
+        cuentaDestinoSelect.addEventListener('change', function() {
+            updateSummary();
+            validateForm();
+        });
+
+        // Interceptar envío del formulario de WebPay
+        document.querySelector('form[name="rec20108_btn1"]').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                alert('Por favor completa todos los campos obligatorios correctamente.');
+                return false;
+            }
+
+            const formData = {
+                nombre: nombreCompletoInput.value.trim(),
+                email: emailInput.value,
+                rut: rutInput.value,
+                destino: cuentaDestinoSelect.value,
+                destinoText: cuentaDestinoSelect.value === 'new_zealand' ? 'New Zealand' : 'Ireland',
+                montoUSD: parseFloat(montoUSDInput.value),
+                montoCLP: parseFloat(montoUSDInput.value) * EXCHANGE_RATE
+            };
+
+            // Confirmación antes de proceder
+            const confirmMessage = `¿Confirmas el pago de ${formData.montoUSD} USD (equivalente a ${formatCurrency(formData.montoCLP)} CLP) con destino a ${formData.destinoText}?
+
+Datos del solicitante:
+• Nombre: ${formData.nombre}
+• Email: ${formData.email}
+• RUT: ${formData.rut}
+
+Se enviará una notificación a AFEX con tus datos.`;
+            
+            if (!confirm(confirmMessage)) {
+                return false;
+            }
+
+            // Enviar email de notificación (no bloquea el proceso si falla)
+            await sendEmail(formData);
+
+            // Continuar con el envío a WebPay después de un breve delay
+            setTimeout(() => {
+                this.submit();
+            }, 1000);
+        });
+
+        // Inicializar
+        validateForm();
+    </script>
+</body>
+</html>
